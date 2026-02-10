@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: midnight-health-check
+  namespace: uptime-dev
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: health-checker
+              image: curlimages/curl
+              command:
+                - curl
+                - -f
+                - "http://app-service.uptime-dev.svc.cluster.local/health"
+
