@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cronjob-rb
+  namespace: uptime-dev
+
+subjects:
+  - kind: ServiceAccount
+    name: sandeep-sa       
+    namespace: uptime-dev
+
+roleRef:
+  kind: Role
+  name: my-role              
+  apiGroup: rbac.authorization.k8s.io
+
