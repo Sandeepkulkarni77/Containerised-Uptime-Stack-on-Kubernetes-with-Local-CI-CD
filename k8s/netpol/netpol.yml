@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-app-and-cron-to-postgres
+  namespace: uptime-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+
+  policyTypes:
+    - Ingress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: flask-app
+        - podSelector:
+            matchLabels:
+              app: midnight-cron-job
+      ports:
+        - protocol: TCP
+          port: 5432
+
