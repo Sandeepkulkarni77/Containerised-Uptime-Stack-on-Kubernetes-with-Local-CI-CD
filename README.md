@@ -68,7 +68,7 @@ Containerised-Uptime-Stack-on-Kubernetes-with-Local-CI-CD/
 ├── registry/            # Local Docker registry (docker compose)
 ├── ci/
 │   └── Jenkinsfile      # CI/CD pipeline definition
-└── README.md            # You are reading it 😊
+└── README.md            
 ```
 
 ---
