@@ -1,6 +1,6 @@
 #  Containerised Uptime Stack on Kubernetes (with Local CI/CD)
 
-A **fully containerised uptime-monitoring application** deployed on Kubernetes with GitOps-style configuration, observability patterns, and a local CI/CD workflow.
+A **fully containerised uptime-monitoring application** deployed on Kubernetes and a local CI/CD workflow.
 
 This project demonstrates end-to-end DevOps fundamentals: containerisation, Kubernetes orchestration, access control, networking policies, workload scaling, persistent storage, configuration management, and automated deployment.
 
