@@ -1,165 +1,190 @@
-#  Containerised Uptime Stack on Kubernetes (with Local CI/CD)
+# Containerised Uptime Stack on Kubernetes with Local CI/CD
 
-A **fully containerised uptime-monitoring application** deployed on Kubernetes and a local CI/CD workflow.
-
-This project demonstrates end-to-end DevOps fundamentals: containerisation, Kubernetes orchestration, access control, networking policies, workload scaling, persistent storage, configuration management, and automated deployment.
+A production-style DevOps project that builds a fully containerised uptime monitoring system with a local Kubernetes deployment and CI/CD pipeline, running entirely without cloud dependency.
 
 ---
 
-##  Features
+## Overview
 
-| Capability                   | Implementation                                       |
-| ---------------------------- | ---------------------------------------------------- |
-| **Application**              | Flask-based uptime service                           |
-| **Containerisation**         | Docker image with lightweight runtime                |
-| **Orchestration**            | Kubernetes Deployment + Service + Ingress            |
-| **Namespace Isolation**      | Dedicated `uptime-dev` namespace                     |
-| **Access Control**           | RBAC with scoped ServiceAccount for CronJob          |
-| **Networking Security**      | Kubernetes NetworkPolicy                             |
-| **Scheduled Jobs**           | Kubernetes CronJob for periodic health checks        |
-| **Persistence**              | PostgreSQL via StatefulSet                           |
-| **Auto-Scaling**             | Horizontal Pod Autoscaler (HPA) using Metrics Server |
-| **Configuration Management** | **Kustomize**                                        |
-| **CI/CD (Local)**            | Jenkins pipeline for build → push → deploy           |
+This project demonstrates how to design, build, and deploy a real-world DevOps system locally. It includes containerised services, Kubernetes orchestration, CI/CD automation, and production-grade practices such as security, scaling, and reliability.
+
+All components run on a local Kubernetes cluster using Docker Desktop with a local container registry.
 
 ---
 
-##  Architecture Overview
+## Goal
 
-```
-Flask App
-   │
-Docker Image ──▶ Local Registry (localhost:5001)
-   │
-Jenkins Pipeline ──▶ kubectl apply -k kustomize
-   │
-Kubernetes Cluster
-   ├── Deployment (uptime-app)
-   ├── Service (ClusterIP)
-   ├── Ingress (nginx)
-   ├── CronJob (health checks)
-   ├── StatefulSet (Postgres)
-   ├── HPA (CPU-based scaling)
-   ├── RBAC (least-privilege access)
-   └── NetworkPolicy (pod-level security)
-```
+- Containerised applications using multi-stage Docker builds  
+- Kubernetes deployment with production-grade components  
+- Local CI/CD pipeline for automated build, test, and deployment  
+- Monitoring, logging, and alerting using scheduled jobs  
 
 ---
 
-##  Repository Structure
+## Architecture
 
-```
-Containerised-Uptime-Stack-on-Kubernetes-with-Local-CI-CD/
-│
-├── app/                 # Flask application + Dockerfile
-├── kustomize/           # Kubernetes manifests managed via Kustomize
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   ├── ingress.yaml
-│   └── kustomization.yml
-│
-├── k8s/
-│   ├── namespace.yaml
-│   ├── HPA/
-│   ├── db/              # Postgres StatefulSet & Service
-│   └── rbac/            # Role + RoleBinding
-│
-├── jobs/                # CronJob manifests
-├── registry/            # Local Docker registry (docker compose)
-├── ci/
-│   └── Jenkinsfile      # CI/CD pipeline definition
-└── README.md            
-```
+<img width="1076" height="863" alt="image" src="https://github.com/user-attachments/assets/65783c6c-b93e-4970-b038-d32d7fdc138d" />
+
 
 ---
 
-##  Prerequisites
+## System Components
 
-You need:
+### Application Layer
+- Flask API with `/health` and `/echo`
+- Graceful shutdown handling
+- Liveness and readiness probes
 
-* Docker Desktop
-* Kubernetes (Docker Desktop Kubernetes or Minikube)
-* kubectl
-* metrics-server installed
-* Jenkins (local)
-* Local Docker registry running on `localhost:5001`
+### Edge Layer
+- Nginx reverse proxy
+- Custom access logs with request timing
+- TLS-enabled Ingress
 
-Start registry:
+### Database Layer
+- PostgreSQL StatefulSet
+- Primary and replica (streaming replication)
+- Persistent storage (PVC)
 
-```bash
-cd registry
-docker compose up -d
-```
+### Background Jobs
+- Metrics collector (writes health data to DB)
+- Log parser (processes Nginx logs)
+- Alert system (SLO evaluation)
 
----
+### Kubernetes Features
+- Ingress with TLS
+- Horizontal Pod Autoscaler (HPA)
+- RBAC (least privilege)
+- Network Policies (default deny)
+- Pod Disruption Budgets
 
-##  Deploying with Kustomize
+### CI/CD Pipeline
+- Jenkins running locally in Docker
 
-Apply all core manifests using:
+Pipeline stages: lint → test → build → scan → push → deploy → smoke → rollback
 
-```bash
-kubectl apply -k kustomize
-```
 
-This applies:
-
-* Deployment
-* Service
-* Ingress
-
----
-
-##  HPA (Auto-Scaling)
-
-The app scales based on CPU usage using Kubernetes HPA.
-
-Check status:
-
-```bash
-kubectl get hpa -n uptime-dev
-```
-
-> Since this is a lightweight demo app, CPU rarely exceeds the threshold — this setup is primarily to demonstrate production patterns.
+### Security
+- Non-root containers
+- Resource limits enforced
+- Image scanning (Trivy)
+- Dockerfile linting (hadolint)
+- Kubernetes manifest linting
 
 ---
 
-## ⏱️ CronJob Behaviour
+## Setup
 
-The CronJob:
+### 1. Clone Repository
 
-* Runs at a scheduled interval
-* Retries on failure up to a defined backoff limit
-* Uses a dedicated ServiceAccount with least-privilege RBAC
+git clone https://github.com/Sandeepkulkarni77/Containerised-Uptime-Stack-on-Kubernetes-with-Local-CI-CD
 
----
-
-##  Security
-
-* **RBAC:** Scoped ServiceAccount for scheduled workloads
-* **NetworkPolicy:** Restricts pod-to-pod communication
-* **Namespace isolation:** Workloads are contained within `uptime-dev`
+cd Containerised-Uptime-Stack-on-Kubernetes-with-Local-CI-CD
 
 ---
 
-## 🧠 CI/CD Workflow (Local Jenkins)
+### 2. Configure Environment
 
-Pipeline stages:
+cp .env.example .env
 
-1. Build Docker image
-2. Tag image for local registry
-3. Push to `localhost:5001`
-4. Deploy using `kubectl apply -k kustomize`
-5. Verify rollout
-
-*(On Windows, batch execution (`bat`) is used instead of `sh`.)*
+Update environment variables as required.
 
 ---
 
-##  What This Project Demonstrates
+### 3. Run Local Development
 
-You can confidently say in interviews:
+docker compose up --build -d
 
-> “I built a containerised Flask application deployed on Kubernetes with Ingress, RBAC, NetworkPolicy, StatefulSet for Postgres, HPA for scaling, and managed manifests using Kustomize. I also defined a Jenkins CI/CD pipeline to automate image builds and deployments.”
+Test:
+
+curl http://localhost:5000/health
+
+---
+
+### 4. Deploy to Kubernetes
+
+kubectl apply -f k8s/base/namespace.yaml  
+bash scripts/load-secrets.sh  
+kubectl apply -k k8s/overlays/dev  
+
+---
+
+### 5. Access Application
+
+curl -k https://uptime.local/health  
+
+(Add `uptime.local` to `/etc/hosts` if required)
+
+---
+
+## CI/CD
+
+Start Jenkins:
+
+make ci
+
+Access Jenkins:
+
+http://localhost:8090
+
+---
+
+## Features
+
+- Fully local DevOps setup (no cloud dependency)
+- End-to-end CI/CD pipeline
+- Auto-scaling using HPA
+- Zero-downtime deployment strategy
+- Production-like architecture
+- Secure container and Kubernetes practices
+
+---
+
+## Security Practices
+
+- Containers run as non-root
+- Image scanning using Trivy
+- Dockerfile linting using hadolint
+- Kubernetes manifest validation
+- Network isolation using policies
+- Secrets managed securely
+
+---
+
+## Testing
+
+- Unit tests executed during Docker build
+- Smoke tests after deployment
+- Load testing for autoscaling validation
+- Automatic rollback on failure
+
+---
+
+## Common Issues
+
+- ImagePullBackOff: Ensure images are pushed to local registry  
+- Missing secrets: Run `load-secrets.sh` before deployment  
+- Port conflicts: Change ports if already in use  
+- Ingress issues: Verify DNS and TLS configuration  
+
+---
+
+## Learning Outcomes
+
+- End-to-end DevOps workflow
+- Kubernetes architecture and deployment patterns
+- CI/CD pipeline implementation
+- Security best practices
+- Scaling and reliability engineering
+
+---
+
+## Notes
+
+- Runs fully locally (offline or LAN)
+- No dependency on cloud providers
+- Designed to simulate production-grade systems on a local machine
+
+
 
 
 
