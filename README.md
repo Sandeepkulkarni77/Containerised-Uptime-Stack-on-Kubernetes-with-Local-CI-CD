@@ -1,4 +1,4 @@
-# 🚀 Containerised Uptime Stack on Kubernetes with Local CI/CD
+#  Containerised Uptime Stack on Kubernetes with Local CI/CD
 
 > A fully offline, production-grade uptime and log intelligence stack running on local Kubernetes with a complete CI/CD pipeline.
 
@@ -20,8 +20,7 @@ This project transforms a "Prod-Lite Uptime & Log Intelligence Stack" into a ful
 ## Architecture
 
 
-
-
+<img width="1076" height="863" alt="Screenshot 2026-03-21 224734" src="https://github.com/user-attachments/assets/6e9d6abd-b480-455c-ad96-652f0b18a327" />
 
 ---
 
@@ -263,11 +262,8 @@ kubectl get hpa -n uptime-dev -w
 The pipeline is defined in `ci/Jenkinsfile` and runs against the local cluster.
 
 ### Pipeline Stages
-
-
-
-
-
+      
+                
 ### Image Tagging Convention
 
 All images are tagged with the Git SHA:
