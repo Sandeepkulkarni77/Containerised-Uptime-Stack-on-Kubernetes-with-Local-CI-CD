@@ -262,8 +262,9 @@ kubectl get hpa -n uptime-dev -w
 The pipeline is defined in `ci/Jenkinsfile` and runs against the local cluster.
 
 ### Pipeline Stages
-      
-                
+
+<img width="1416" height="609" alt="image" src="https://github.com/user-attachments/assets/f7cfffcf-f237-48de-a3c6-df48869a64fa" />
+                    
 ### Image Tagging Convention
 
 All images are tagged with the Git SHA:
